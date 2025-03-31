@@ -1,0 +1,11 @@
+pyTelegramBotAPI==4.14.0
+gitpython>=3.1.30
+flask==2.3.3
+g4f==0.4.7.7
+werkzeug==2.3.7
+flask-sqlalchemy==3.1.1
+waitress==2.1.2
+gunicorn==21.2.0
+pillow==10.1.0
+bcrypt==4.0.1
+python-dotenv==1.0.0 

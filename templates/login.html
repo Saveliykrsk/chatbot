@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход | NettyGPT</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: all 0.1s ease;
+        }
+        
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: #000000;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .auth-container {
+            background-color: #0c0c0c;
+            padding: 30px;
+            border-radius: 3px;
+            border: 1px solid #1a1a1a;
+            width: 100%;
+            max-width: 340px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 500;
+            font-size: 1.3rem;
+            letter-spacing: -0.5px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #1a1a1a;
+            border-radius: 3px;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            font-size: 0.8rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #2a2a2a;
+        }
+        
+        button {
+            width: 100%;
+            padding: 10px 12px;
+            background-color: #ffffff;
+            border: none;
+            border-radius: 3px;
+            color: #000000;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            margin-top: 5px;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+        }
+        
+        .auth-links {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #8a8a8a;
+        }
+        
+        .auth-links a {
+            color: #ffffff;
+            text-decoration: none;
+        }
+        
+        .auth-links a:hover {
+            opacity: 0.9;
+        }
+        
+        .error {
+            color: #ff4d4d;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.8rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <h1>Вход</h1>
+        <form id="loginForm" method="POST">
+            <div class="form-group">
+                <input type="text" name="username" placeholder="Имя пользователя" required>
+            </div>
+            <div class="form-group">
+                <input type="password" name="password" placeholder="Пароль" required>
+            </div>
+            {% if show_recaptcha %}
+            <div class="form-group">
+                <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
+            </div>
+            {% endif %}
+            <button type="submit">Войти</button>
+            <div class="error" id="error-message"></div>
+        </form>
+        <div class="auth-links">
+            Нет аккаунта? <a href="/register">Зарегистрироваться</a>
+        </div>
+    </div>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const errorDiv = document.getElementById('error-message');
+            
+            fetch('/login', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = data.redirect || '/chat';
+                } else {
+                    errorDiv.textContent = data.error || 'Ошибка при входе';
+                    errorDiv.style.display = 'block';
+                    
+                    // Если есть перенаправление на страницу подтверждения email
+                    if (data.redirect && data.redirect === '/email_confirmation_notice') {
+                        setTimeout(() => {
+                            window.location.href = data.redirect;
+                        }, 2000);
+                    }
+                    
+                    // Сбрасываем капчу для повторной попытки
+                    grecaptcha.reset();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                errorDiv.textContent = 'Произошла ошибка при входе';
+                errorDiv.style.display = 'block';
+                grecaptcha.reset();
+            });
+        });
+    </script>
+</body>
+</html> 

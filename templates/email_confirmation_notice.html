@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подтвердите ваш email | NettyGPT</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: all 0.1s ease;
+        }
+        
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: #000000;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #0c0c0c;
+            padding: 30px;
+            border-radius: 3px;
+            border: 1px solid #1a1a1a;
+            width: 100%;
+            max-width: 540px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-weight: 500;
+            font-size: 1.3rem;
+            letter-spacing: -0.5px;
+        }
+
+        p {
+            margin-bottom: 20px;
+            color: #d4d4d4;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        
+        .email-icon {
+            font-size: 48px;
+            color: #ffffff;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+        
+        .back-button {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #ffffff;
+            color: #000000;
+            text-decoration: none;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 20px;
+        }
+        
+        .back-button:hover {
+            opacity: 0.9;
+        }
+        
+        .additional-links {
+            margin-top: 30px;
+            font-size: 0.8rem;
+            color: #8a8a8a;
+        }
+        
+        .additional-links a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        
+        .additional-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <i class="fas fa-envelope email-icon"></i>
+        <h1>Подтвердите ваш email</h1>
+        <p>Мы отправили письмо с ссылкой подтверждения на ваш email адрес. Пожалуйста, проверьте вашу почту и перейдите по ссылке для активации аккаунта.</p>
+        <p>Если вы не получили письмо, проверьте папку "Спам" или запросите повторную отправку письма.</p>
+        <a href="/" class="back-button">Вернуться на главную</a>
+        
+        <div class="additional-links">
+            <a href="/login">Войти</a>
+            <a href="#" id="resend-email">Отправить письмо повторно</a>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('resend-email').addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('Функция повторной отправки письма будет доступна в ближайшее время.');
+            // TODO: Добавить функцию повторной отправки письма
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ошибка | NettyGPT</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: all 0.1s ease;
+        }
+        
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: #000000;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #0c0c0c;
+            padding: 30px;
+            border-radius: 3px;
+            border: 1px solid #1a1a1a;
+            width: 100%;
+            max-width: 540px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-weight: 500;
+            font-size: 1.3rem;
+            letter-spacing: -0.5px;
+            color: #ff4d4d;
+        }
+
+        p {
+            margin-bottom: 20px;
+            color: #d4d4d4;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        
+        .error-icon {
+            font-size: 48px;
+            color: #ff4d4d;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+        
+        .back-button {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #ffffff;
+            color: #000000;
+            text-decoration: none;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 20px;
+        }
+        
+        .back-button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <i class="fas fa-exclamation-triangle error-icon"></i>
+        <h1>Произошла ошибка</h1>
+        <p>{{ error }}</p>
+        <a href="/" class="back-button">Вернуться на главную</a>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,47 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+venv/
+env/
+ENV/
+.env
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Logs
+*.log
+logs/
+
+# Database
+instance/
+*.db
+*.sqlite3
+
+# Generated content
+generated_images/
+backups/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Electron build
+electron-app/dist/
+electron-app/node_modules/
+
+# Temporary dirs
+.qodo/
+123/
+har_and_cookies/ 

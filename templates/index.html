@@ -1,0 +1,2288 @@
+<!DOCTYPE html>
+  <html lang="ru">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+      <title>NettyGPT</title>
+      <meta name="description" content="Чат с NettyGPT | Первый проект NettyStudio!">
+      <link rel="stylesheet" href="/static/styles.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+      <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+      <link rel="icon" href="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAB0AAAAgCAYAAADud3N8AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAY6SURBVHgB5VdtSJVnGL7f86Hmt1JmUtKKsDmyJsHmAonNYGRKwaiktIgc+9lwvyLYfqxgBCm0Hxk0HNT8EWwx2BxmksTCipVBOhzpojQ/0qlHj3o87/s+u65n7+vOOTtubUF/dsPj6X0+7uu+r/vjeRL5v4jxL/Yp599piYmJK5RSyR6PZ3p+fn4McwsYHmePkhcUL/8kJyevWrZs2SWABCIU6+Hz+VRSUtLP+C1xznjk+Z2JEsM5DH1JnVS+fv16+9SpU/atW7fU0NCQevbsmerp6VFnz55VmzZtsr1erzJNM3z8+PF3Ig2OJ54lAAWevQFFc+vWrdva3d0tDx48MAoLC6WhoUHKysqkpKREjh49KiMjI+rkyZOGZVkCqo3ly5e3GYbRDBUWhl+e10vQWUHv6urqTMROwXoTcVRQFgaNP/n9/vMYn2O04TtEL7G2MDk5qaqrq23MWWlpab3/5LEr3oSEhCICnjt3zlxYWFBr166lkiAAapZgRrBOStXExITavXu3jjOGmZ6e3hbJXlxA/oFydezYsTBEZWVl6WSB59+7+pc4m8B9T58+VeXl5fpsZ2en7ZytXMpYLVSen5+vKV29erUipU1NTbTaTklJuRppXIwkEaCvr0/t3LlTgzY2NqojR47osCzlLS3J5OZ79+6pXbt26YOnT59Wd+/eVe3t7bTaTk1N/XoJBYncz2xGktFYG+Wlrl+/Tk9tfH8UD9RAaZwvKCiwUBKaFsRjjLGBtaqlpUVduHBBzwP4kzjACa7B27dNQy4bAAAAAElFTkSuQmCC" type="image/x-icon">
+      <!-- Подключаем Prism для подсветки кода -->
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.24.1/themes/prism-tomorrow.min.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/plugins/line-numbers/prism-line-numbers.min.css">
+      <script src="https://cdn.jsdelivr.net/npm/marked@2.1.3/marked.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/prismjs@1.24.1/prism.min.js"></script>
+      <!-- Дополнительные языки для Prism -->
+      <script src="https://cdn.jsdelivr.net/npm/prismjs@1.24.1/components/prism-python.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/prismjs@1.24.1/components/prism-bash.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/prismjs@1.24.1/components/prism-javascript.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/prismjs@1.24.1/components/prism-css.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/prismjs@1.24.1/components/prism-jsx.min.js"></script>
+      <style>
+          * {
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+              transition: all 0.1s ease;
+          }
+          
+          body {
+              font-family: 'JetBrains Mono', monospace;
+              background-color: #000000;
+              color: #ffffff;
+              display: flex;
+              height: 100vh;
+              margin: 0;
+              overflow: hidden;
+              position: fixed;
+              width: 100%;
+          }
+          
+          .chat-container {
+              display: flex;
+              width: 100%;
+              margin: 0 auto;
+              overflow: hidden;
+          }
+          
+          .chat-panel {
+              min-width: 300px;
+              width: 300px;
+              background-color: #000000;
+              border-right: 1px solid #1a1a1a;
+              padding: 20px;
+              display: flex;
+              flex-direction: column;
+          }
+          
+          .chat-box {
+              position: relative;
+              flex: 1;
+              display: flex;
+              flex-direction: column;
+              padding: 15px;
+              background-color: #000000;
+              max-width: 100%;
+              box-sizing: border-box;
+              overflow: hidden;
+              padding-bottom: 80px;
+          }
+          
+          #buy-button {
+              flex-grow: 1;
+              padding: 15px;
+              margin-top: 2vh;
+              width: 70%;
+              margin: 0 auto;
+              border-radius: 3px;
+              text-align: center;
+          }
+          
+          #buy-button button {
+              width: 100%;
+              max-width: 300px;
+              margin: 10px 0;
+              padding: 12px 20px;
+              font-size: 0.8rem;
+              font-weight: 500;
+              background-color: #ffffff;
+              color: #000000;
+          }
+          
+          #buy-button button:hover {
+              opacity: 0.9;
+          }
+          
+          #buy-button .price {
+              font-size: 1.5rem;
+              font-weight: 500;
+              color: #ffffff;
+              margin: 10px 0;
+          }
+          
+          #buy-button .description {
+              color: #8a8a8a;
+              margin: 10px 0;
+              font-size: 0.8rem;
+          }
+          
+          #messages {
+              flex: 1;
+              width: 98%;
+              overflow-y: auto;
+              margin-bottom: 15px;
+              padding: 20px;
+              background-color: #000000;
+              scrollbar-width: thin;
+              scrollbar-color: #1a1a1a transparent;
+              margin-bottom: 70px;
+          }
+          
+          #messages::-webkit-scrollbar {
+              width: 4px;
+              background-color: transparent;
+          }
+          
+          #messages::-webkit-scrollbar-thumb {
+              background-color: #1a1a1a;
+              border-radius: 4px;
+          }
+          
+          #messages::-webkit-scrollbar-thumb:hover {
+              background-color: #2a2a2a;
+          }
+          
+          #messages::-webkit-scrollbar-track {
+              background-color: transparent;
+              border-radius: 4px;
+          }
+          
+          .chat-box p {
+              margin: 12px 0;
+              padding: 12px 16px;
+              border-radius: 3px;
+              font-size: 0.8rem;
+              line-height: 1.6;
+              word-wrap: break-word;
+              max-width: 100%;
+              overflow-wrap: break-word;
+          }
+          
+          .message {
+              margin: 20px 0;
+              padding: 0;
+              opacity: 1;
+              max-width: 100%;
+          }
+          
+          .user-message {
+              background-color: #1a1a1a;
+              padding: 16px;
+              border-radius: 3px;
+              margin-left: auto;
+              max-width: 85%;
+              overflow-wrap: break-word;
+              word-wrap: break-word;
+              word-break: break-word;
+          }
+          
+          .user-message strong {
+              color: #ffffff;
+              margin-right: 10px;
+              display: inline;
+              font-weight: 500;
+              font-size: 0.8rem;
+          }
+          
+          .user-message .content {
+              display: inline;
+              word-wrap: break-word;
+              word-break: break-word;
+              overflow-wrap: break-word;
+          }
+          
+          .bot-message {
+              background-color: #0c0c0c;
+              padding: 16px;
+              border-radius: 3px;
+              margin-right: auto;
+              margin-left: 0;
+              max-width: 85%;
+              border: 1px solid #1a1a1a;
+              overflow-wrap: break-word;
+              word-wrap: break-word;
+              word-break: break-word;
+          }
+          
+          .bot-message strong {
+              color: #ffffff;
+              display: block;
+              font-size: 0.8rem;
+              margin-bottom: 15px;
+              font-weight: 500;
+          }
+          
+          .bot-message .content {
+              white-space: pre-wrap;
+              word-wrap: break-word;
+              word-break: break-word;
+              font-size: 0.8rem;
+              line-height: 1.6;
+              margin-top: 15px;
+              margin-left: 0;
+              padding: 0;
+              color: #d4d4d4;
+              max-width: 100%;
+              overflow-x: auto;
+          }
+          
+          .bot-message .content p {
+              margin: 10px 0;
+              max-width: 100%;
+              overflow-wrap: break-word;
+              word-wrap: break-word;
+              word-break: break-word;
+          }
+          
+          .bot-message .content ul, 
+          .bot-message .content ol {
+              margin-left: 20px;
+              margin-top: 10px;
+              margin-bottom: 10px;
+          }
+          
+          .bot-message .content li {
+              margin-bottom: 5px;
+          }
+          
+          /* Для блоков кода внутри сообщений бота */
+          .bot-message pre {
+              margin: 10px 0 !important;
+              padding: 15px !important;
+              padding-top: 30px !important;
+              background-color: #1a1a1a !important;
+              border-radius: 3px !important;
+              font-size: 0.8rem !important;
+              overflow-x: auto !important;
+              max-width: 100% !important;
+              position: relative !important;
+          }
+          
+          .bot-message code {
+              overflow-wrap: break-word;
+              white-space: pre-wrap;
+              word-break: break-word;
+              font-family: 'JetBrains Mono', monospace !important;
+          }
+          
+          .copy-button {
+              position: absolute;
+              top: 5px;
+              right: 5px;
+              padding: 3px 8px;
+              background-color: #2a2a2a;
+              color: #ffffff;
+              border: none;
+              border-radius: 3px;
+              font-size: 0.7rem;
+              cursor: pointer;
+              opacity: 0.7;
+              z-index: 10;
+          }
+          
+          .copy-button:hover {
+              opacity: 1;
+          }
+          
+          .copy-button.copied {
+              background-color: #4a4a4a;
+          }
+          
+          pre {
+              position: relative;
+          }
+          
+          /* Fix for Prism styles */
+          .token.comment,
+          .token.prolog,
+          .token.doctype,
+          .token.cdata {
+              color: #8a8a8a;
+          }
+          
+          .token.punctuation {
+              color: #f8f8f2;
+          }
+          
+          .token.namespace {
+              opacity: .7;
+          }
+          
+          .token.property,
+          .token.tag,
+          .token.constant,
+          .token.symbol,
+          .token.deleted {
+              color: #ff79c6;
+          }
+          
+          .token.boolean,
+          .token.number {
+              color: #bd93f9;
+          }
+          
+          .token.selector,
+          .token.attr-name,
+          .token.string,
+          .token.char,
+          .token.builtin,
+          .token.inserted {
+              color: #50fa7b;
+          }
+          
+          .token.operator,
+          .token.entity,
+          .token.url,
+          .language-css .token.string,
+          .style .token.string {
+              color: #f8f8f2;
+          }
+          
+          .token.atrule,
+          .token.attr-value,
+          .token.keyword {
+              color: #ff79c6;
+          }
+          
+          .token.function,
+          .token.class-name {
+              color: #ffb86c;
+          }
+          
+          .token.regex,
+          .token.important,
+          .token.variable {
+              color: #f1fa8c;
+          }
+          
+          .chat-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+          }
+          
+          .logo {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #ffffff;
+            text-decoration: none;
+            margin-right: auto;
+          }
+          
+          .user-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 0.9rem;
+          }
+          
+          .user-avatar.admin {
+            background-color: #2a2a2a;
+            border: 1px solid #3a3a3a;
+          }
+          
+          .admin-link {
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s ease;
+          }
+          
+          .admin-link:hover .user-avatar.admin {
+            background-color: #3a3a3a;
+            transform: scale(1.1);
+          }
+          
+          .admin-link .user-avatar.admin i {
+            color: #FFD700;
+            font-size: 0.85rem;
+          }
+          
+          .premium-badge {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            padding: 10px 15px;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            font-weight: 500;
+          }
+          
+          .premium-badge button {
+            background-color: #ffffff;
+            color: #000000;
+            padding: 8px 12px;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 10px;
+            width: 100%;
+          }
+          
+          .chat-switcher {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+          }
+          
+          .chat-switcher a {
+            color: #8a8a8a;
+            text-decoration: none;
+            font-size: 0.8rem;
+            margin-right: 10px;
+          }
+          
+          .chat-switcher a:hover {
+            color: #ffffff;
+          }
+
+          #toggle-image-generation {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 3px;
+            background-color: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            color: #ffffff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+          }
+
+          #toggle-image-generation:hover {
+            background-color: #2a2a2a;
+          }
+
+          #toggle-image-generation i {
+            font-size: 1rem;
+          }
+          
+          /* Восстановленные стили */
+          .send {
+              position: fixed;
+              bottom: 0;
+              left: 0;
+              right: 0;
+              width: 100%;
+              min-height: 60px;
+              background-color: #0c0c0c;
+              z-index: 999999;
+              padding: 10px 15px;
+              border: none;
+              border-top: 1px solid #1a1a1a;
+              margin: 0;
+              display: flex !important;
+              align-items: center !important;
+              gap: 8px !important;
+              box-sizing: border-box;
+          }
+          
+          #user-input {
+              flex: 1;
+              height: 36px;
+              padding: 0 12px;
+              background-color: #1a1a1a;
+              border: 1px solid #1a1a1a;
+              border-radius: 3px;
+              color: #fff;
+              font-size: 0.8rem;
+              outline: none;
+              font-family: 'JetBrains Mono', monospace;
+          }
+          
+          #user-input:focus {
+              border-color: #2a2a2a;
+          }
+          
+          #user-input::placeholder {
+              color: #6a6a6a;
+          }
+          
+          #send-button {
+              width: 36px;
+              height: 36px;
+              padding: 0;
+              background-color: #ffffff;
+              border: none;
+              border-radius: 3px;
+              color: #000000;
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              flex-shrink: 0;
+          }
+          
+          #send-button:hover {
+              opacity: 0.9;
+          }
+          
+          #send-button i {
+              font-size: 0.9rem;
+          }
+          
+          .delete-chat-button {
+              margin-left: 8px;
+              padding: 6px 10px;
+              background-color: #1a1a1a;
+              border-radius: 3px;
+              color: #8a8a8a;
+              cursor: pointer;
+              opacity: 0.7;
+          }
+          
+          .delete-chat-button:hover {
+              background-color: #2a2a2a;
+              opacity: 1;
+              color: #ffffff;
+          }
+          
+          button {
+              padding: 8px 12px;
+              border: none;
+              background-color: #ffffff;
+              color: #000000;
+              border-radius: 3px;
+              cursor: pointer;
+              font-size: 0.8rem;
+              font-family: 'JetBrains Mono', monospace;
+              font-weight: 500;
+          }
+          
+          button:hover {
+              opacity: 0.9;
+          }
+          
+          .chat-item {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              padding: 10px;
+              margin: 5px 0;
+              border-radius: 3px;
+              cursor: pointer;
+              background-color: #0c0c0c;
+              border: 1px solid #1a1a1a;
+          }
+          
+          .chat-item:hover {
+              background-color: #1a1a1a;
+              border-color: #2a2a2a;
+          }
+          
+          .chat-content {
+              flex-grow: 1;
+              padding-right: 10px;
+              font-size: 0.8rem;
+          }
+          
+          .chat-item.active {
+              background-color: #1a1a1a;
+              border-color: #2a2a2a;
+          }
+          
+          #typing-indicator {
+              display: none;
+              margin: 10px 0;
+              padding: 8px 12px;
+              border-radius: 3px;
+              background-color: #0c0c0c;
+              text-align: left;
+              align-self: flex-start;
+              font-size: 0.8rem;
+          }
+          
+          #typing-indicator .typing-animation {
+              color: #8a8a8a;
+          }
+          
+          #typing-indicator strong {
+              color: #ffffff;
+              font-weight: 500;
+          }
+          
+          #image-generation-container {
+              position: fixed;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              width: 80%;
+              max-width: 600px;
+              max-height: 80vh;
+              background-color: #0c0c0c;
+              border: 1px solid #1a1a1a;
+              border-radius: 3px;
+              padding: 20px;
+              z-index: 1000;
+              overflow-y: auto;
+              display: none;
+          }
+
+          @media (max-width: 1200px) {
+              #image-generation-container {
+                  width: 300px;
+              }
+          }
+          
+          .greeting-text {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              text-align: center;
+              width: 80%;
+              max-width: 600px;
+          }
+          
+          .greeting-text h1 {
+              font-size: 1.5rem;
+              font-weight: 500;
+              margin-bottom: 15px;
+              color: #ffffff;
+              letter-spacing: -0.5px;
+          }
+          
+          .greeting-text p {
+              font-size: 0.9rem;
+              color: #8a8a8a;
+              margin-bottom: 15px;
+          }
+          
+          .mode-selector {
+              display: flex;
+              align-items: center;
+              margin-right: 10px;
+          }
+          
+          .mode-selector a {
+              color: #8a8a8a;
+              text-decoration: none;
+              font-size: 0.8rem;
+              padding: 5px 10px;
+              border-radius: 3px;
+              margin-right: 5px;
+          }
+          
+          .mode-selector a:hover,
+          .mode-selector a.active {
+              color: #ffffff;
+              background-color: #1a1a1a;
+          }
+          
+          /* Добавляем стили для анимации */
+          @keyframes fadeIn {
+              from { opacity: 0; transform: translate(-50%, -60%); }
+              to { opacity: 1; transform: translate(-50%, -50%); }
+          }
+          
+          @keyframes pulse {
+              0% { transform: scale(1); }
+              50% { transform: scale(1.05); }
+              100% { transform: scale(1); }
+          }
+          
+          #notification-popup {
+              animation: fadeIn 0.5s ease-out, pulse 2s infinite ease-in-out;
+              box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+              border: 1px solid #2a2a2a;
+          }
+          
+          #notification-popup h3 {
+              color: #ffffff;
+              font-weight: 600;
+          }
+          
+          #notification-popup p {
+              line-height: 1.6;
+          }
+          
+          #close-notification {
+              transition: all 0.2s ease;
+              margin-top: 10px;
+          }
+          
+          #close-notification:hover {
+              background-color: #eeeeee;
+              transform: translateY(-2px);
+          }
+
+          /* Добавляем стили для Premium модального окна */
+          @keyframes modalFadeIn {
+              from { opacity: 0; transform: translate(-50%, -60%); }
+              to { opacity: 1; transform: translate(-50%, -50%); }
+          }
+
+          #premium-modal .modal-content {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              background-color: #0c0c0c;
+              border: 1px solid #1a1a1a;
+              border-radius: 5px;
+              padding: 25px;
+              width: 90%;
+              max-width: 450px;
+              text-align: center;
+              box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+              animation: modalFadeIn 0.3s ease-out;
+          }
+
+          #premium-modal .feature-list {
+              text-align: left;
+              margin-bottom: 20px;
+              color: #d4d4d4;
+              font-size: 0.9rem;
+              list-style-type: none;
+          }
+
+          #premium-modal .feature-list li {
+              margin-bottom: 10px;
+              display: flex;
+              align-items: flex-start;
+          }
+
+          #premium-modal .feature-list li i {
+              color: #50fa7b;
+              margin-right: 10px;
+              flex-shrink: 0;
+              margin-top: 3px;
+          }
+
+          #premium-modal .price-box {
+              background-color: #1a1a1a;
+              padding: 15px;
+              border-radius: 5px;
+              margin-bottom: 20px;
+              transition: transform 0.2s;
+              cursor: pointer;
+          }
+
+          #premium-modal .price-box:hover {
+              transform: translateY(-2px);
+              background-color: #242424;
+          }
+
+          #payment-submit-btn {
+              width: 100%;
+              padding: 12px;
+              background-color: #ffffff;
+              color: #000000;
+              border: none;
+              border-radius: 3px;
+              font-weight: 500;
+              cursor: pointer;
+              margin-bottom: 15px;
+              transition: transform 0.2s, opacity 0.2s;
+          }
+
+          #payment-submit-btn:hover {
+              transform: translateY(-2px);
+              opacity: 0.9;
+          }
+
+          #close-premium-modal {
+              padding: 8px 15px;
+              background: none;
+              border: 1px solid #1a1a1a;
+              color: #8a8a8a;
+              border-radius: 3px;
+              cursor: pointer;
+              transition: background-color 0.2s, color 0.2s;
+          }
+
+          #close-premium-modal:hover {
+              background-color: #1a1a1a;
+              color: #ffffff;
+          }
+
+          /* Обновляем стили для индикатора печатания */
+          @keyframes fadeIn {
+              from { opacity: 0; }
+              to { opacity: 1; }
+          }
+          
+          @keyframes blink {
+              0% { opacity: .2; }
+              20% { opacity: 1; }
+              100% { opacity: .2; }
+          }
+          
+          .typing-animation {
+              display: inline-block;
+              color: #50fa7b;
+              font-style: italic;
+              font-weight: 600;
+              font-size: 1em;
+          }
+          
+          .typing-animation::after {
+              content: '';
+              display: inline-block;
+              width: 6px;
+              height: 6px;
+              background-color: #50fa7b;
+              border-radius: 50%;
+              margin-left: 5px;
+              animation: blink 1.4s infinite both;
+          }
+          
+          .bot-message .content {
+              transition: color 0.2s ease-in-out;
+          }
+          
+          .bot-message code {
+              animation: fadeIn 0.3s ease-in-out;
+          }
+          
+          @keyframes cursor-blink {
+              0% { opacity: 1; }
+              50% { opacity: 0; }
+              100% { opacity: 1; }
+          }
+          
+          .cursor-typing {
+              display: inline-block;
+              width: 2px;
+              height: 15px;
+              background-color: #50fa7b;
+              margin-left: 2px;
+              animation: cursor-blink 0.8s infinite;
+              vertical-align: middle;
+          }
+
+          /* Добавляем адаптивные стили для мобильных устройств */
+          @media (max-width: 768px) {
+              body {
+                  overflow: hidden;
+                  position: fixed;
+                  width: 100%;
+                  height: 100%;
+              }
+              
+              .chat-container {
+                  flex-direction: column;
+                  height: 100%;
+                  overflow: hidden;
+              }
+              
+              .chat-panel {
+                  position: fixed;
+                  top: 0;
+                  left: -280px;
+                  width: 280px;
+                  height: 100%;
+                  z-index: 1000;
+                  transition: left 0.3s ease;
+                  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+              }
+              
+              .chat-panel.active {
+                  left: 0;
+              }
+              
+              .chat-box {
+                  width: 100%;
+                  height: 100vh;
+                  padding-bottom: 70px;
+              }
+              
+              #messages {
+                  padding-bottom: 120px;
+              }
+              
+              .premium-badge {
+                  bottom: 70px;
+                  right: 10px;
+                  width: auto;
+                  padding: 5px 10px;
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  opacity: 0.7;
+              }
+              
+              .premium-badge span {
+                  font-size: 0.7rem;
+              }
+              
+              .premium-badge button {
+                  padding: 5px 8px;
+                  font-size: 0.7rem;
+              }
+              
+              #toggle-image-generation {
+                  bottom: 70px;
+                  right: 10px;
+              }
+              
+              .send {
+                  padding: 8px 10px;
+                  height: auto;
+              }
+              
+              #user-input {
+                  height: 36px;
+              }
+              
+              .message {
+                  padding: 10px;
+                  margin: 5px 0;
+              }
+              
+              .message .content {
+                  font-size: 0.9rem;
+              }
+              
+              pre {
+                  max-width: 100%;
+                  overflow-x: auto;
+              }
+              
+              code {
+                  font-size: 0.8rem;
+              }
+              
+              #image-generation-container {
+                  width: 95%;
+                  max-width: 95%;
+              }
+              
+              #premium-modal .modal-content {
+                  width: 95%;
+                  max-width: 95%;
+                  padding: 15px;
+              }
+              
+              /* Добавляем кнопку для открытия боковой панели */
+              .menu-toggle {
+                  position: fixed;
+                  top: 10px;
+                  left: 10px;
+                  width: 40px;
+                  height: 40px;
+                  border-radius: 3px;
+                  background-color: #1a1a1a;
+                  border: 1px solid #2a2a2a;
+                  color: #ffffff;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  z-index: 999;
+                  cursor: pointer;
+              }
+              
+              .menu-toggle i {
+                  font-size: 1.2rem;
+              }
+              
+              /* Добавляем оверлей для закрытия боковой панели */
+              .panel-overlay {
+                  display: none;
+                  position: fixed;
+                  top: 0;
+                  left: 0;
+                  width: 100%;
+                  height: 100%;
+                  background-color: rgba(0, 0, 0, 0.5);
+                  z-index: 999;
+              }
+              
+              .panel-overlay.active {
+                  display: block;
+              }
+              
+              /* Стили для мобильного фокуса */
+              #user-input:focus {
+                  outline: none;
+                  border-color: #ffffff;
+              }
+              
+              /* Улучшаем тапы на кнопках */
+              button, a {
+                  min-height: 36px;
+                  min-width: 36px;
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+              }
+              
+              /* Оптимизация шрифтов для малых экранов */
+              .greeting-text h1 {
+                  font-size: 1.3rem;
+              }
+              
+              .greeting-text p {
+                  font-size: 0.8rem;
+              }
+              
+              /* Улучшаем отступы в боковой панели */
+              .chat-header {
+                  padding: 10px;
+              }
+              
+              .chat-switcher {
+                  margin-bottom: 10px;
+                  padding: 0 10px;
+              }
+              
+              .chat-switcher a {
+                  margin-right: 5px;
+                  font-size: 0.7rem;
+              }
+              
+              /* Улучшаем отображение индикатора печатания */
+              #typing-indicator {
+                  margin: 5px 10px;
+                  padding: 8px 10px;
+              }
+              
+              /* Улучшаем отображение сообщений на мобильных */
+              .message pre {
+                  font-size: 0.8rem;
+                  line-height: 1.4;
+                  padding: 8px;
+                  border-radius: 3px;
+              }
+              
+              .message pre code {
+                  white-space: pre-wrap;
+                  word-break: break-all;
+              }
+              
+              .message img {
+                  max-width: 100%;
+                  height: auto;
+              }
+              
+              /* Уменьшаем размер курсора при печатании на мобильных */
+              .cursor-typing {
+                  height: 12px;
+              }
+              
+              /* Фиксируем плавающие элементы на мобильных */
+              .premium-badge, #toggle-image-generation {
+                  transition: bottom 0.3s ease;
+              }
+              
+              /* Добавляем области для лучшего тапа */
+              .mode-selector a {
+                  padding: 8px 10px;
+                  margin-right: 3px;
+              }
+          }
+      </style>
+  </head>
+  <body>
+    <div class="menu-toggle">
+        <i class="fas fa-bars"></i>
+    </div>
+    
+    <div class="panel-overlay"></div>
+    
+    <div class="chat-container">
+        <div class="chat-panel">
+            <div class="chat-header">
+                <a href="/" class="logo">NettyGPT</a>
+                {% if has_admin_role %}
+                <a href="/admin" class="admin-link" title="Перейти в админ-панель">
+                    <div class="user-avatar admin">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                </a>
+                {% else %}
+                <div class="user-avatar">Я</div>
+                {% endif %}
+            </div>
+            <div class="chat-switcher">
+                <a href="#" id="create-chat-button"><i class="fas fa-plus"></i> Новый чат</a>
+                <a href="#" onclick="location.reload()"><i class="fas fa-sync"></i> Обновить</a>
+                <a href="#" id="reset-settings"><i class="fas fa-eraser"></i> Сбросить настройки</a>
+            </div>
+            <div id="chat-list">
+                <!-- Здесь будет список чатов -->
+            </div>
+        </div>
+        
+        <div class="chat-box">
+            <div id="messages">
+                <!-- Здесь будут сообщения чата -->
+            </div>
+            
+            <div class="greeting-text" id="greeting-text">
+                <h1>Добрый вечер, Ваня.</h1>
+                <p>Чем я могу помочь сегодня?</p>
+            </div>
+            
+            <div id="typing-indicator" style="display: none; background-color: #0c0c0c; border-left: 3px solid #50fa7b; padding: 10px 15px; margin: 10px 0; border-radius: 3px; font-size: 0.9rem;"></div>
+            
+            <div class="send">
+                <div class="mode-selector">
+                    <a href="#" class="active" data-model="gpt-4o"><i class="fas fa-comments"></i> Free</a>
+                    <a href="#" data-model="o3-mini"><i class="fas fa-brain"></i> Think</a>
+                </div>
+                <input type="text" id="user-input" placeholder="Что ты хочешь узнать?" autocomplete="off">
+                <button id="send-button"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="premium-badge">
+        <span>NettyGPT Premium</span><br>
+        <span style="font-size: 0.7rem; color: #8a8a8a;">Используйте продвинутые возможности</span>
+        <button id="subscribe-premium-btn">Подписаться на Premium</button>
+    </div>
+
+    <button id="toggle-image-generation">
+        <i class="fas fa-image"></i>
+    </button>
+
+    <div id="image-generation-container">
+        <button id="close-image-generation">
+            <i class="fas fa-times"></i>
+        </button>
+        <h2><i class="fas fa-image"></i> Генерация изображения</h2>
+        <input type="text" id="image-prompt" placeholder="Введите описание изображения..." />
+        <button id="generate-image-button"><i class="fas fa-magic"></i> Сгенерировать изображение</button>
+        <div id="generations-counter" style="margin-top: 10px; color: #ffffff;" hidden>
+            <i class="fas fa-info-circle"></i> Осталось генераций сегодня: <span id="remaining-generations">15</span>
+        </div>
+        <div id="image-generating-indicator" style="display: none; margin-top: 10px; color: #ffffff;">
+            <i class="fas fa-spinner fa-spin"></i> NettyGPT создает изображение...
+        </div>
+        <div id="generated-image-container"></div>
+    </div>
+
+    <div id="error-message" style="display: none; position: fixed; top: 20px; right: 20px; background-color: #1a1a1a; color: #ff4d4d; padding: 10px 15px; border-radius: 3px; z-index: 1000;">
+        <i class="fas fa-exclamation-circle"></i> 
+        <span id="error-text"></span>
+    </div>
+
+    <div id="notification-popup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #1a1a1a; color: #ffffff; padding: 20px; border-radius: 5px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 1001; max-width: 400px; text-align: center;">
+        <h3 style="margin-bottom: 15px; font-size: 1.2rem;">Добро пожаловать в NettyGPT!</h3>
+        <p style="margin-bottom: 15px; font-size: 0.9rem; color: #cccccc;">Первый проект от NettyStudio - работает на базе GPT-4o!</p>
+        <button id="close-notification" style="background-color: #ffffff; color: #000000; border: none; padding: 8px 20px; border-radius: 3px; cursor: pointer; font-weight: 500;">Понятно</button>
+    </div>
+
+    <!-- Добавляем модальное окно для покупки Premium -->
+    <div id="premium-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); z-index: 2000;">
+        <div class="modal-content">
+            <h2 style="font-size: 1.3rem; margin-bottom: 15px;"><i class="fas fa-crown" style="color: #FFD700;"></i> NettyGPT Premium</h2>
+            <p style="margin-bottom: 20px; color: #d4d4d4; font-size: 0.9rem;">Получите доступ к расширенным возможностям:</p>
+            
+            <ul class="feature-list">
+                <li><i class="fas fa-check"></i> <span>Доступ к модели o3-mini с расширенным мышлением</span></li>
+                <li><i class="fas fa-check"></i> <span>Безлимитная генерация изображений</span></li>
+                <li><i class="fas fa-check"></i> <span>Доступ к будущим премиум-функциям</span></li>
+            </ul>
+            
+            <div class="price-box">
+                <p style="font-size: 1.5rem; font-weight: 600; margin-bottom: 5px;">100 ₽ / месяц</p>
+                <p style="font-size: 0.8rem; color: #8a8a8a;">Оплата через ЮMoney</p>
+            </div>
+            
+            <form action="/create_payment" method="POST" id="payment-form">
+                <input type="hidden" name="amount" value="100">
+                <input type="hidden" name="description" value="Подписка Premium на NettyGPT">
+                <button type="submit" id="payment-submit-btn">Оформить подписку</button>
+            </form>
+            
+            <button id="close-premium-modal">Отмена</button>
+        </div>
+    </div>
+
+    <!-- Скрипты -->
+    <script>
+        let activeChatId = null;
+
+        // Функция для сохранения состояния чата
+        function saveChatState() {
+            if (activeChatId) {
+                localStorage.setItem('activeChatId', activeChatId);
+            }
+        }
+
+        // Функция для восстановления состояния чата
+        async function restoreChatState() {
+            const savedChatId = localStorage.getItem('activeChatId');
+            if (savedChatId) {
+                await switchChat(savedChatId);
+                // Если есть сохраненный чат, скрываем приветствие
+                document.getElementById('greeting-text').style.display = 'none';
+            }
+        }
+
+        // Обновляем функцию switchChat
+        async function switchChat(chatId) {
+            if (!chatId) return;
+            
+            // Убираем активный класс у всех чатов
+            document.querySelectorAll('.chat-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Добавляем активный класс к выбранному чату
+            const selectedChat = document.querySelector(`[data-chat-id="${chatId}"]`);
+            if (selectedChat) {
+                selectedChat.classList.add('active');
+            }
+            
+            activeChatId = chatId;
+            saveChatState();
+            await loadChatHistory(chatId);
+            
+            // Скрываем приветствие при переключении чата
+            document.getElementById('greeting-text').style.display = 'none';
+            
+            // На мобильных устройствах закрываем боковую панель после выбора чата
+            if (window.innerWidth <= 768) {
+                const chatPanel = document.querySelector('.chat-panel');
+                const panelOverlay = document.querySelector('.panel-overlay');
+                chatPanel.classList.remove('active');
+                panelOverlay.classList.remove('active');
+                
+                // Прокручиваем чат вниз
+                setTimeout(scrollToBottom, 300);
+            }
+        }
+
+        // Вызываем восстановление состояния при загрузке страницы
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadChatList();
+            await restoreChatState();
+            
+            // Добавляем обработчик для кнопки создания нового чата
+            document.getElementById('create-chat-button').addEventListener('click', function(e) {
+                e.preventDefault();
+                createNewChat();
+            });
+            
+            // Настраиваем контейнер генерации изображений
+            const imageContainer = document.getElementById('image-generation-container');
+            imageContainer.style.position = 'fixed';
+            imageContainer.style.top = '50%';
+            imageContainer.style.left = '50%';
+            imageContainer.style.transform = 'translate(-50%, -50%)';
+            imageContainer.style.width = '80%';
+            imageContainer.style.maxWidth = '500px';
+            imageContainer.style.maxHeight = '80vh';
+            imageContainer.style.backgroundColor = '#0c0c0c';
+            imageContainer.style.border = '1px solid #1a1a1a';
+            imageContainer.style.borderRadius = '3px';
+            imageContainer.style.padding = '20px';
+            imageContainer.style.zIndex = '1000';
+            imageContainer.style.overflowY = 'auto';
+            imageContainer.style.display = 'none';
+            
+            // Стили для кнопки закрытия
+            const closeButton = document.getElementById('close-image-generation');
+            closeButton.style.position = 'absolute';
+            closeButton.style.top = '10px';
+            closeButton.style.right = '10px';
+            closeButton.style.background = 'none';
+            closeButton.style.border = 'none';
+            closeButton.style.color = '#ffffff';
+            closeButton.style.fontSize = '1rem';
+            closeButton.style.cursor = 'pointer';
+            
+            // Стили для поля ввода
+            const imagePrompt = document.getElementById('image-prompt');
+            imagePrompt.style.width = '100%';
+            imagePrompt.style.padding = '10px 12px';
+            imagePrompt.style.margin = '15px 0';
+            imagePrompt.style.backgroundColor = '#1a1a1a';
+            imagePrompt.style.border = '1px solid #1a1a1a';
+            imagePrompt.style.borderRadius = '3px';
+            imagePrompt.style.color = '#ffffff';
+            imagePrompt.style.fontSize = '0.8rem';
+            imagePrompt.style.fontFamily = "'JetBrains Mono', monospace";
+            
+            // Стили для кнопки генерации
+            const generateButton = document.getElementById('generate-image-button');
+            generateButton.style.width = '100%';
+            generateButton.style.padding = '10px 12px';
+            generateButton.style.margin = '10px 0';
+            generateButton.style.backgroundColor = '#ffffff';
+            generateButton.style.color = '#000000';
+            generateButton.style.border = 'none';
+            generateButton.style.borderRadius = '3px';
+            generateButton.style.fontSize = '0.8rem';
+            generateButton.style.cursor = 'pointer';
+            generateButton.style.fontFamily = "'JetBrains Mono', monospace";
+            generateButton.style.fontWeight = '500';
+        });
+
+        // Обновляем функцию createNewChat
+        async function createNewChat() {
+            try {
+                const response = await fetch('/api/create_chat', { method: 'POST' });
+                const data = await response.json();
+                const chatList = document.getElementById('chat-list');
+                const chatItem = document.createElement('div');
+                chatItem.classList.add('chat-item');
+                chatItem.setAttribute('data-chat-id', data.chat_id);
+                
+                const chatContent = document.createElement('div');
+                chatContent.className = 'chat-content';
+                chatContent.innerHTML = `<i class="fas fa-comments"></i> ${data.title}`;
+                chatContent.onclick = () => switchChat(data.chat_id);
+                
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'delete-chat-button';
+                deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i>';
+                deleteButton.onclick = (e) => {
+                    e.stopPropagation();
+                    deleteChat(data.chat_id);
+                };
+                
+                chatItem.appendChild(chatContent);
+                chatItem.appendChild(deleteButton);
+                
+                if (chatList.firstChild) {
+                    chatList.insertBefore(chatItem, chatList.firstChild);
+                } else {
+                    chatList.appendChild(chatItem);
+                }
+                
+                // Очищаем сообщения
+                document.getElementById('messages').innerHTML = '';
+                
+                // Скрываем приветствие
+                document.getElementById('greeting-text').style.display = 'none';
+                
+                await switchChat(data.chat_id);
+                return data.chat_id;
+            } catch (error) {
+                console.error('Error creating chat:', error);
+                showError('Ошибка при создании чата');
+                return null;
+            }
+        }
+
+        // Обновляем функцию deleteChat
+        async function deleteChat(chatId) {
+            if (confirm('Вы уверены, что хотите удалить этот чат?')) {
+                try {
+                    const response = await fetch(`/api/delete_chat/${chatId}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (response.ok) {
+                        const chatElement = document.querySelector(`[data-chat-id="${chatId}"]`);
+                        if (chatElement) {
+                            chatElement.remove();
+                        }
+                        if (chatId === activeChatId) {
+                            localStorage.removeItem('activeChatId');
+                            document.getElementById('messages').innerHTML = '';
+                            activeChatId = null;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error deleting chat:', error);
+                    showError('Ошибка при удалении чата');
+                }
+            }
+        }
+
+        document.getElementById('user-input').addEventListener('keydown', async (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                await sendMessage();
+            }
+        });
+
+        // Настройка marked для безопасной обработки кода
+        marked.setOptions({
+            breaks: true,
+            gfm: true,
+            sanitize: false,
+            smartLists: true,
+            smartypants: true,
+            xhtml: false,
+            highlight: function(code, lang) {
+                if (!code) return '';
+                if (Prism.languages[lang]) {
+                    try {
+                        return Prism.highlight(code, Prism.languages[lang], lang);
+                    } catch (e) {
+                        console.error('Prism highlight error:', e);
+                        return code;
+                    }
+                }
+                return code;
+            },
+            langPrefix: 'language-'
+        });
+
+        // Функция для безопасного парсинга markdown с разделением сообщений
+        function safeMarkdownParse(content) {
+            try {
+                // Функция для экранирования HTML
+                function escapeHtml(text) {
+                    return text
+                        .replace(/&/g, "&amp;")
+                        .replace(/</g, "&lt;")
+                        .replace(/>/g, "&gt;")
+                        .replace(/"/g, "&quot;")
+                        .replace(/'/g, "&#039;");
+                }
+
+                // Сначала обрабатываем блоки кода
+                content = content.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
+                    // Если язык не указан, пытаемся определить его
+                    if (!lang) {
+                        if (code.includes('class') && code.includes('public')) {
+                            lang = 'csharp';
+                        } else if (code.includes('def ') || code.includes('import ')) {
+                            lang = 'python';
+                        } else if (code.includes('function') || code.includes('const ')) {
+                            lang = 'javascript';
+                        } else if (code.includes('<') && code.includes('>')) {
+                            lang = 'html';
+                        } else {
+                            lang = 'plaintext';
+                        }
+                    }
+                    return `<pre><code class="language-${lang}">${escapeHtml(code.trim())}</code></pre>`;
+                });
+
+                // Проверяем, является ли весь текст кодом
+                if (isHtmlCode(content) && !content.includes('```')) {
+                    // Если это код, но он не обёрнут в маркеры кода
+                    let lang = 'plaintext';
+                    if (content.includes('<') && content.includes('>')) {
+                        lang = 'html';
+                    } else if (content.includes('function') || content.includes('const ')) {
+                        lang = 'javascript';
+                    } else if (content.includes('def ') || content.includes('import ')) {
+                        lang = 'python';
+                    }
+                    content = `<pre><code class="language-${lang}">${escapeHtml(content.trim())}</code></pre>`;
+                    return content;
+                }
+
+                // Для остального текста используем обычный markdown
+                return marked.parse(content);
+            } catch (e) {
+                console.error('Markdown parse error:', e);
+                return escapeHtml(content);
+            }
+        }
+
+        // Функция для добавления кнопок копирования к блокам кода
+        function addCopyButtons() {
+            document.querySelectorAll('pre code').forEach(function(codeBlock) {
+                const pre = codeBlock.parentNode;
+                
+                // Проверяем, есть ли уже кнопка копирования
+                if (pre.querySelector('.copy-button')) {
+                    return;
+                }
+                
+                const button = document.createElement('button');
+                button.className = 'copy-button';
+                button.textContent = 'Копировать';
+                button.style.position = 'absolute';
+                button.style.right = '5px';
+                button.style.top = '5px';
+                button.style.fontSize = '0.7rem';
+                button.style.padding = '3px 8px';
+                button.style.border = 'none';
+                button.style.borderRadius = '3px';
+                button.style.backgroundColor = '#2a2a2a';
+                button.style.color = '#ffffff';
+                button.style.cursor = 'pointer';
+                
+                button.addEventListener('click', function() {
+                    const code = codeBlock.textContent;
+                    navigator.clipboard.writeText(code).then(function() {
+                        button.textContent = 'Скопировано!';
+                        button.style.backgroundColor = '#4a4a4a';
+                        setTimeout(function() {
+                            button.textContent = 'Копировать';
+                            button.style.backgroundColor = '#2a2a2a';
+                        }, 2000);
+                    }, function(err) {
+                        console.error('Не удалось скопировать текст: ', err);
+                        button.textContent = 'Ошибка';
+                        setTimeout(function() {
+                            button.textContent = 'Копировать';
+                        }, 2000);
+                    });
+                });
+                
+                pre.appendChild(button);
+            });
+        }
+
+        // Функция для проверки, содержит ли текст код
+        function isHtmlCode(text) {
+            const codePatterns = [
+                /^<!DOCTYPE/i,
+                /^<html/i,
+                /function\s+\w+\s*\(/,
+                /^import\s+/,
+                /^def\s+\w+\s*\(/,
+                /^class\s+\w+/,
+                /^const\s+\w+\s*=/,
+                /^let\s+\w+\s*=/,
+                /^var\s+\w+\s*=/
+            ];
+            
+            return codePatterns.some(pattern => pattern.test(text.trim()));
+        }
+
+        // Обновляем функцию загрузки истории чата
+        async function loadChatHistory(chatId) {
+            try {
+                console.log('Loading chat history for chat:', chatId);
+                const response = await fetch(`/api/chat_history/${chatId}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to load chat history: ${response.status} ${response.statusText}`);
+                }
+                
+                const messages = await response.json();
+                console.log('Received messages:', messages);
+                
+                if (!Array.isArray(messages)) {
+                    throw new Error('Invalid response format: messages is not an array');
+                }
+                
+                const messagesDiv = document.getElementById('messages');
+                if (!messagesDiv) {
+                    throw new Error('Messages container not found');
+                }
+                
+                messagesDiv.innerHTML = '';
+                
+                messages.forEach((msg, index) => {
+                    try {
+                        if (!msg || !msg.role) {
+                            console.warn(`Invalid message at index ${index}:`, msg);
+                            return;
+                        }
+                        
+                        const messageDiv = document.createElement('div');
+                        messageDiv.className = `message ${msg.role}-message`;
+                        
+                        let content = msg.content || '';
+                        console.log(`Processing message ${index}:`, { role: msg.role, content });
+                        
+                        if (isHtmlCode(content)) {
+                            content = '```html\n' + content + '\n```';
+                        }
+
+                        if (msg.role === 'user') {
+                            if (msg.image_path) {
+                                messageDiv.innerHTML = `
+                                    <strong>Вы:</strong>
+                                    <img src="${msg.image_path}" class="chat-image" alt="Изображение пользователя" onerror="this.style.display='none'">
+                                `;
+                            } else {
+                                messageDiv.innerHTML = `<strong>Вы:</strong> ${safeMarkdownParse(content)}`;
+                            }
+                        } else {
+                            const strongEl = document.createElement('strong');
+                            strongEl.textContent = 'NettyGPT:';
+                            
+                            const brEl = document.createElement('br');
+                            brEl.style.marginBottom = '10px';
+                            
+                            const contentDiv = document.createElement('div');
+                            contentDiv.className = 'content';
+                            contentDiv.style.marginTop = '15px';
+                            contentDiv.innerHTML = safeMarkdownParse(content);
+                            
+                            messageDiv.appendChild(strongEl);
+                            messageDiv.appendChild(brEl);
+                            messageDiv.appendChild(contentDiv);
+                        }
+                        
+                        messagesDiv.appendChild(messageDiv);
+                        
+                        Prism.highlightAllUnder(messageDiv);
+                        setTimeout(addCopyButtons, 0);
+                    } catch (messageError) {
+                        console.error(`Error processing message ${index}:`, messageError);
+                    }
+                });
+                
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                
+            } catch (error) {
+                console.error('Error loading chat history:', error);
+                showError(`Ошибка при загрузке истории чата: ${error.message}`);
+            }
+        }
+
+        // Обновляем функцию для создания сообщения бота
+        async function createBotMessage(content) {
+            const botMsg = document.createElement('div');
+            botMsg.className = 'message bot-message';
+            
+            const strongEl = document.createElement('strong');
+            strongEl.textContent = 'NettyGPT:';
+            
+            const brEl = document.createElement('br');
+            brEl.style.marginBottom = '10px';
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'content';
+            contentDiv.style.marginTop = '15px';
+            contentDiv.innerHTML = safeMarkdownParse(content);
+            
+            botMsg.appendChild(strongEl);
+            botMsg.appendChild(brEl);
+            botMsg.appendChild(contentDiv);
+            
+            return botMsg;
+        }
+
+        // Обновляем функцию sendMessage
+        async function sendMessage() {
+            const userInputEl = document.getElementById('user-input');
+            const userText = userInputEl.value.trim();
+            const sendButton = document.getElementById('send-button');
+            // Находим активную модель из переключателей режимов
+            const activeMode = document.querySelector('.mode-selector a.active');
+            const selectedModel = activeMode ? activeMode.getAttribute('data-model') : 'gpt-4o';
+            
+            if (!userText) {
+                console.log('Пустое сообщение');
+                return;
+            }
+
+            // Если нет активного чата, создаем новый
+            if (!activeChatId) {
+                activeChatId = await createNewChat();
+                if (!activeChatId) return;
+            }
+            
+            // Скрываем приветствие при отправке сообщения
+            document.getElementById('greeting-text').style.display = 'none';
+            
+            sendButton.disabled = true;
+            try {
+                const messagesDiv = document.getElementById('messages');
+                const typingIndicator = document.getElementById('typing-indicator');
+                
+                // Показываем индикатор печатания
+                if (typingIndicator) {
+                    typingIndicator.style.display = 'block';
+                }
+                
+                // Создаем сообщение пользователя
+                const userMsg = document.createElement('div');
+                userMsg.className = 'message user-message';
+                
+                let displayText = userText;
+                if (isHtmlCode(userText)) {
+                    displayText = '```html\n' + userText + '\n```';
+                }
+                
+                const userStrongEl = document.createElement('strong');
+                userStrongEl.textContent = 'Вы:';
+                
+                const userContentDiv = document.createElement('div');
+                userContentDiv.className = 'content';
+                userContentDiv.innerHTML = safeMarkdownParse(displayText);
+                
+                userMsg.appendChild(userStrongEl);
+                userMsg.appendChild(userContentDiv);
+                
+                messagesDiv.appendChild(userMsg);
+                
+                // Применяем подсветку синтаксиса
+                if (window.Prism) {
+                    Prism.highlightAllUnder(userMsg);
+                }
+                
+                // Отправляем запрос на сервер
+                const requestStartTime = Date.now();
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: userText,
+                        chat_id: activeChatId,
+                        model: selectedModel
+                    })
+                });
+
+                console.log('Статус ответа:', response.status);
+                
+                // Обрабатываем ошибки HTTP
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('Ошибка API:', errorData);
+                    
+                    // Скрываем индикатор печати
+                    typingIndicator.style.display = 'none';
+                    
+                    // Добавляем сообщение об ошибке в чат
+                    const errorMessage = errorData.error || 'Произошла ошибка при обработке запроса';
+                    addMessageToChat('assistant', `Ошибка: ${errorMessage}`);
+                    
+                    // Если это серьезная ошибка сервера, предлагаем перезагрузку
+                    if (response.status >= 500) {
+                        setTimeout(() => {
+                            if (confirm('Произошла ошибка на сервере. Перезагрузить страницу?')) {
+                                window.location.reload();
+                            }
+                        }, 1000);
+                    }
+                    
+                    return;
+                }
+                
+                // Получаем ответ от сервера
+                const data = await response.json();
+                
+                // Добавляем ответ бота на страницу
+                addMessageToChat('assistant', data.reply);
+                
+                // Скрываем индикатор печати
+                typingIndicator.style.display = 'none';
+                
+                // Если ответ пришел слишком быстро, добавляем задержку для UX
+                const responseTime = Date.now() - requestStartTime;
+                if (responseTime < 500) {
+                    await new Promise(resolve => setTimeout(resolve, 500 - responseTime));
+                }
+                
+                // Прокручиваем чат вниз
+                scrollToBottom();
+                
+            } catch (error) {
+                console.error('Ошибка JavaScript:', error);
+                
+                // Скрываем индикатор печати
+                typingIndicator.style.display = 'none';
+                
+                // Добавляем сообщение об ошибке в чат
+                addMessageToChat('assistant', 'Произошла ошибка при отправке сообщения. Пожалуйста, перезагрузите страницу и попробуйте снова.');
+                
+                // Предлагаем перезагрузить страницу
+                setTimeout(() => {
+                    if (confirm('Произошла ошибка соединения. Перезагрузить страницу?')) {
+                        window.location.reload();
+                    }
+                }, 1000);
+            } finally {
+                sendButton.disabled = false;
+            }
+        }
+
+        document.getElementById('send-button').addEventListener('click', sendMessage);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Устанавливаем фон страницы принудительно
+            document.body.style.backgroundColor = '#000000';
+            document.body.style.color = '#ffffff';
+            document.querySelector('.chat-box').style.backgroundColor = '#000000';
+            
+            // Показываем уведомление при каждой загрузке страницы
+            document.getElementById('notification-popup').style.display = 'block';
+            
+            // Обработчик для закрытия уведомления
+            document.getElementById('close-notification').addEventListener('click', function() {
+                document.getElementById('notification-popup').style.display = 'none';
+            });
+            
+            // Добавляем обработчик для сброса настроек
+            document.getElementById('reset-settings').addEventListener('click', function(e) {
+                e.preventDefault();
+                localStorage.clear();
+                alert('Настройки сброшены. Страница будет перезагружена.');
+                location.reload();
+            });
+            
+            // Заменяем обработчики для плашки Premium и кнопки подписки
+            document.querySelector('.premium-badge').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('premium-modal').style.display = 'block';
+            });
+            
+            document.getElementById('subscribe-premium-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation(); // Предотвращаем всплытие события
+                document.getElementById('premium-modal').style.display = 'block';
+            });
+            
+            // Добавляем обработчик для закрытия модального окна
+            document.getElementById('close-premium-modal').addEventListener('click', function() {
+                document.getElementById('premium-modal').style.display = 'none';
+            });
+            
+            // Закрытие модального окна по клику вне него
+            document.getElementById('premium-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.style.display = 'none';
+                }
+            });
+            
+            // Добавляем обработчик для закрытия модального окна по клавише Escape
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && document.getElementById('premium-modal').style.display === 'block') {
+                    document.getElementById('premium-modal').style.display = 'none';
+                }
+            });
+            
+            // Повторно инициализируем Prism для подсветки синтаксиса
+            if (window.Prism) {
+                Prism.highlightAll();
+                setTimeout(addCopyButtons, 200);
+            }
+            
+            const savedChatId = localStorage.getItem('activeChatId');
+            
+            fetch('/api/get_chats')
+                .then(response => response.json())
+                .then(chats => {
+                    const chatList = document.getElementById('chat-list');
+                    chatList.innerHTML = '';
+                    chats.forEach(chat => {
+                        const chatItem = document.createElement('div');
+                        chatItem.classList.add('chat-item');
+                        chatItem.setAttribute('data-chat-id', chat.id);
+                        chatItem.innerHTML = `
+                            <div class="chat-content" onclick="switchChat('${chat.id}')">
+                                <i class="fas fa-comments"></i> ${chat.title}
+                            </div>
+                            <button class="delete-chat-button" onclick="event.stopPropagation(); deleteChat('${chat.id}')">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        `;
+                        chatItem.onclick = () => switchChat(chat.id);
+                        chatList.appendChild(chatItem);
+                    });
+                    
+                    if (savedChatId && chats.some(chat => chat.id === parseInt(savedChatId))) {
+                        switchChat(savedChatId);
+                    } else if (chats.length > 0) {
+                        switchChat(chats[0].id);
+                    }
+                });
+
+            // Единая функция создания чата
+            document.getElementById('create-chat-button').addEventListener('click', async (e) => {
+                e.preventDefault();
+                await createNewChat();
+            });
+
+            // Обработчики для панели генерации изображений
+            const toggleButton = document.getElementById('toggle-image-generation');
+            const closeButton = document.getElementById('close-image-generation');
+            const imageContainer = document.getElementById('image-generation-container');
+
+            toggleButton.style.display = 'flex';
+
+            toggleButton.addEventListener('click', () => {
+                imageContainer.style.display = 'block';
+                imageContainer.style.animation = 'slideIn 0.3s ease-out';
+            });
+
+            closeButton.addEventListener('click', () => {
+                imageContainer.style.display = 'none';
+            });
+
+            // Закрытие по клику вне контейнера
+            imageContainer.addEventListener('click', (e) => {
+                if (e.target === imageContainer) {
+                    imageContainer.style.display = 'none';
+                }
+            });
+
+            // Закрытие по клавише Escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && imageContainer.style.display === 'block') {
+                    imageContainer.style.display = 'none';
+                }
+            });
+
+            // Обработчик для кнопки генерации изображения
+            document.getElementById('generate-image-button').addEventListener('click', async function() {
+                const prompt = document.getElementById('image-prompt').value.trim();
+                if (!prompt) {
+                    showError('Пожалуйста, введите описание изображения');
+                    return;
+                }
+
+                const button = this;
+                const indicator = document.getElementById('image-generating-indicator');
+                const container = document.getElementById('generated-image-container');
+
+                try {
+                    button.disabled = true;
+                    indicator.style.display = 'block';
+                    container.innerHTML = '';
+
+                    const response = await fetch('/api/generate_image', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ prompt })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Ошибка при генерации изображения');
+                    }
+
+                    const data = await response.json();
+                    
+                    if (data.image_url) {
+                        const img = document.createElement('img');
+                        img.src = data.image_url;
+                        img.style.width = '100%';
+                        img.style.borderRadius = '8px';
+                        img.style.marginTop = '20px';
+                        container.appendChild(img);
+
+                        // Обновляем счетчик оставшихся генераций
+                        if (data.remaining_generations !== undefined) {
+                            const counter = document.getElementById('remaining-generations');
+                            counter.textContent = data.remaining_generations;
+                            document.getElementById('generations-counter').hidden = false;
+                        }
+                    } else {
+                        throw new Error('Не удалось получить URL изображения');
+                    }
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    showError(error.message || 'Произошла ошибка при генерации изображения');
+                } finally {
+                    button.disabled = false;
+                    indicator.style.display = 'none';
+                }
+            });
+
+            // Добавим обработчик для переключения режимов
+            document.querySelectorAll('.mode-selector a').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Удаляем класс active у всех
+                    document.querySelectorAll('.mode-selector a').forEach(el => el.classList.remove('active'));
+                    // Добавляем класс active текущему элементу
+                    this.classList.add('active');
+                    
+                    console.log('Режим переключен на:', this.textContent.trim(), 'Модель:', this.getAttribute('data-model'));
+                });
+            });
+
+            // Обработчик для формы оплаты
+            document.getElementById('payment-form').addEventListener('submit', async function(e) {
+                const submitButton = document.getElementById('payment-submit-btn');
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Перенаправление на оплату...';
+                
+                // Форма отправится стандартным способом после изменения текста кнопки
+                setTimeout(() => {
+                    submitButton.innerHTML = 'Перенаправление на страницу оплаты...';
+                }, 1000);
+            });
+
+            // Добавим обработчик для клика на блок с ценой, чтобы он тоже активировал форму
+            document.querySelector('#premium-modal .price-box').addEventListener('click', function() {
+                document.getElementById('payment-submit-btn').click();
+            });
+
+            // Добавляем обработчики для мобильного меню
+            const menuToggle = document.querySelector('.menu-toggle');
+            const chatPanel = document.querySelector('.chat-panel');
+            const panelOverlay = document.querySelector('.panel-overlay');
+            
+            menuToggle.addEventListener('click', function() {
+                chatPanel.classList.add('active');
+                panelOverlay.classList.add('active');
+            });
+            
+            panelOverlay.addEventListener('click', function() {
+                chatPanel.classList.remove('active');
+                panelOverlay.classList.remove('active');
+            });
+            
+            // Закрываем панель при выборе чата на мобильном
+            const chatItems = document.querySelectorAll('.chat-item');
+            chatItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        chatPanel.classList.remove('active');
+                        panelOverlay.classList.remove('active');
+                    }
+                });
+            });
+            
+            // Фикс для iOS Safari - предотвращение скроллинга на фоне
+            document.body.addEventListener('touchmove', function(e) {
+                if (panelOverlay.classList.contains('active') && !chatPanel.contains(e.target)) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+            
+            // Фикс виртуальной клавиатуры для мобильных
+            const userInput = document.getElementById('user-input');
+            
+            userInput.addEventListener('focus', function() {
+                if (window.innerWidth <= 768) {
+                    // Даем время для появления клавиатуры
+                    setTimeout(function() {
+                        document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+                        
+                        // Смещаем страницу вверх, чтобы поле ввода было видно
+                        window.scrollTo(0, 0);
+                        
+                        // Смещаем плавающие элементы, чтобы они не закрывали поле ввода
+                        document.querySelector('.premium-badge').style.bottom = '150px';
+                        const toggleButton = document.getElementById('toggle-image-generation');
+                        if (toggleButton) {
+                            toggleButton.style.bottom = '150px';
+                        }
+                    }, 300);
+                }
+            });
+            
+            userInput.addEventListener('blur', function() {
+                if (window.innerWidth <= 768) {
+                    // Возвращаем плавающие элементы на место
+                    setTimeout(function() {
+                        document.querySelector('.premium-badge').style.bottom = '70px';
+                        const toggleButton = document.getElementById('toggle-image-generation');
+                        if (toggleButton) {
+                            toggleButton.style.bottom = '90px';
+                        }
+                    }, 300);
+                }
+            });
+            
+            // Обработка ориентации экрана
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    chatPanel.classList.remove('active');
+                    panelOverlay.classList.remove('active');
+                }
+                scrollToBottom();
+            });
+            
+            // Обновляем функцию создания нового чата
+            document.getElementById('create-chat-button').addEventListener('click', function(e) {
+                e.preventDefault();
+                if (window.innerWidth <= 768) {
+                    chatPanel.classList.remove('active');
+                    panelOverlay.classList.remove('active');
+                }
+                createNewChat();
+            });
+        });
+
+        // Функция для показа сообщения об ошибке
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            const errorText = document.getElementById('error-text');
+            errorText.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        // Функция для загрузки списка чатов
+        async function loadChatList() {
+            try {
+                const response = await fetch('/api/get_chats');
+                if (!response.ok) {
+                    throw new Error('Failed to load chats');
+                }
+                
+                const chats = await response.json();
+                const chatList = document.getElementById('chat-list');
+                chatList.innerHTML = '';
+                
+                chats.forEach(chat => {
+                    const chatItem = document.createElement('div');
+                    chatItem.classList.add('chat-item');
+                    chatItem.setAttribute('data-chat-id', chat.id);
+                    chatItem.innerHTML = `<i class="fas fa-comments"></i> ${chat.title} <button class="delete-chat-button" onclick="deleteChat('${chat.id}'); event.stopPropagation();"><i class="fas fa-trash-alt"></i></button>`;
+                    chatItem.onclick = () => switchChat(chat.id);
+                    chatList.appendChild(chatItem);
+                });
+            } catch (error) {
+                console.error('Error loading chats:', error);
+                showError('Ошибка при загрузке списка чатов');
+            }
+        }
+
+        // Функция для добавления сообщения в чат
+        function addMessageToChat(role, content) {
+            const messagesDiv = document.getElementById('messages');
+            
+            // Создаем элемент сообщения
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}-message`;
+            
+            // Определяем, является ли контент кодом
+            if (role === 'assistant' && isHtmlCode(content) && !content.trim().startsWith('```')) {
+                let lang = 'plaintext';
+                if (content.includes('<') && content.includes('>')) {
+                    lang = 'html';
+                } else if (content.includes('function') || content.includes('const ')) {
+                    lang = 'javascript';
+                } else if (content.includes('def ') || content.includes('import ')) {
+                    lang = 'python';
+                }
+                content = '```' + lang + '\n' + content + '\n```';
+            }
+            
+            // Форматируем содержимое сообщения
+            if (role === 'assistant') {
+                // Если это сообщение от бота, обрабатываем его как markdown
+                const strongEl = document.createElement('strong');
+                strongEl.textContent = 'NettyGPT:';
+                
+                const brEl = document.createElement('br');
+                brEl.style.marginBottom = '10px';
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'content';
+                contentDiv.style.marginTop = '15px';
+                
+                // Добавляем сначала пустой div для контента
+                messageDiv.appendChild(strongEl);
+                messageDiv.appendChild(brEl);
+                messageDiv.appendChild(contentDiv);
+                
+                // Добавляем сообщение в контейнер
+                messagesDiv.appendChild(messageDiv);
+                
+                // Прокручиваем чат вниз
+                scrollToBottom();
+                
+                // Показываем индикатор печатания
+                const typingIndicator = document.getElementById('typing-indicator');
+                typingIndicator.style.display = 'block';
+                typingIndicator.innerHTML = '<span class="typing-animation">nettygpt пишет...</span>';
+                
+                // Подготавливаем полный разобранный контент заранее
+                const parsedContent = safeMarkdownParse(content);
+                
+                // Новый подход к анимации: мы сначала готовим весь HTML-контент,
+                // а затем только показываем его по частям
+                
+                // Создаем невидимый контейнер для полного содержимого
+                const hiddenContainer = document.createElement('div');
+                hiddenContainer.innerHTML = parsedContent;
+                hiddenContainer.style.display = 'none';
+                document.body.appendChild(hiddenContainer);
+                
+                // Разделяем контент для анимации
+                const textNodes = [];
+                const codeBlocks = [];
+                
+                // Получаем все текстовые узлы и кодовые блоки
+                function collectNodes(element) {
+                    if (element.nodeType === Node.TEXT_NODE) {
+                        if (element.textContent.trim() !== '') {
+                            textNodes.push(element);
+                        }
+                    } else if (element.tagName === 'PRE' || 
+                              (element.tagName === 'CODE' && element.parentNode.tagName !== 'PRE')) {
+                        codeBlocks.push(element);
+                    } else {
+                        for (let i = 0; i < element.childNodes.length; i++) {
+                            collectNodes(element.childNodes[i]);
+                        }
+                    }
+                }
+                
+                collectNodes(hiddenContainer);
+                
+                // Теперь анимируем появление текста по 4 символа за раз
+                const typingChunkSize = 4; // Размер блока текста для анимации
+                let visibleContent = '';
+                let currentPosition = 0;
+                
+                // Функция для анимации
+                function animateTyping() {
+                    // Создаем полный HTML для сообщения
+                    let fullHtml = parsedContent;
+                    
+                    // Показываем только часть контента
+                    currentPosition += typingChunkSize;
+                    
+                    // Если мы показали весь контент
+                    if (currentPosition >= fullHtml.length) {
+                        // Отображаем полное содержимое
+                        contentDiv.innerHTML = parsedContent;
+                        
+                        // Скрываем индикатор печатания
+                        typingIndicator.style.display = 'none';
+                        
+                        // Удаляем временный элемент
+                        hiddenContainer.remove();
+                        
+                        // Применяем подсветку синтаксиса
+                        Prism.highlightAllUnder(messageDiv);
+                        setTimeout(addCopyButtons, 0);
+                        
+                        return;
+                    }
+                    
+                    // Отображаем содержимое до текущей позиции с ограничением на полный контент
+                    let visibleHtml = fullHtml.substring(0, Math.min(currentPosition, fullHtml.length));
+                    
+                    // Добавляем мигающий курсор в конец видимого текста
+                    visibleHtml += '<span class="cursor-typing"></span>';
+                    
+                    // Обновляем содержимое
+                    contentDiv.innerHTML = visibleHtml;
+                    
+                    // Прокручиваем чат вниз при каждом обновлении
+                    scrollToBottom();
+                    
+                    // Вычисляем случайную задержку для более реалистичного эффекта печатания
+                    const baseDelay = 10;
+                    const randomDelay = Math.floor(Math.random() * 15) + baseDelay;
+                    
+                    // Продолжаем анимацию
+                    setTimeout(animateTyping, randomDelay);
+                }
+                
+                // Запускаем анимацию
+                setTimeout(animateTyping, 100);
+                
+            } else {
+                // Если это сообщение от пользователя
+                const userStrongEl = document.createElement('strong');
+                userStrongEl.textContent = 'Вы:';
+                
+                const userContentDiv = document.createElement('div');
+                userContentDiv.className = 'content';
+                userContentDiv.innerHTML = safeMarkdownParse(content);
+                
+                messageDiv.appendChild(userStrongEl);
+                messageDiv.appendChild(userContentDiv);
+                
+                // Добавляем сообщение в контейнер
+                messagesDiv.appendChild(messageDiv);
+                
+                // Прокручиваем чат вниз
+                scrollToBottom();
+            }
+        }
+
+        // Функция для прокрутки чата вниз
+        function scrollToBottom() {
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+    </script>
+</body>
+</html>

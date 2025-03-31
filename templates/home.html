@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NettyGPT - Умный ИИ-ассистент</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: all 0.1s ease;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: #000000;
+            color: #ffffff;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        /* Header styles */
+        .header {
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            padding: 0.8rem 1.5rem;
+            background: #000000;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #ffffff;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links a {
+            color: #8a8a8a;
+            text-decoration: none;
+            margin-left: 1.5rem;
+            font-size: 0.8rem;
+            font-weight: 400;
+            transition: color 0.1s ease;
+        }
+
+        .nav-links a:hover {
+            color: #ffffff;
+        }
+
+        .nav-links a.register,
+        .nav-links a.chat {
+            color: #000000;
+            background: #ffffff;
+            padding: 0.4rem 0.8rem;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+
+        .nav-links a.register:hover,
+        .nav-links a.chat:hover {
+            opacity: 0.9;
+        }
+
+        /* Hero section styles */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            padding-top: 5rem;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            line-height: 1.2;
+            margin-bottom: 1.2rem;
+            color: #ffffff;
+            letter-spacing: -1px;
+        }
+
+        .hero p {
+            font-size: 1rem;
+            color: #8a8a8a;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Chat interface styles */
+        .chat-interface {
+            max-width: 800px;
+            margin: 2rem auto;
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+            border: 1px solid #1a1a1a;
+            border-radius: 4px;
+            overflow: hidden;
+            background-color: #0c0c0c;
+        }
+
+        .chat-header {
+            padding: 0.8rem;
+            background-color: #0c0c0c;
+            border-bottom: 1px solid #1a1a1a;
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-header-title {
+            color: #ffffff;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .chat-header-icon {
+            margin-right: 0.5rem;
+            color: #8a8a8a;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            background-color: #000000;
+        }
+
+        .message {
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .message-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.8rem;
+            font-size: 0.7rem;
+            color: #fff;
+        }
+
+        .message-name {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #ffffff;
+        }
+
+        .message-content {
+            font-size: 0.9rem;
+            color: #d4d4d4;
+            line-height: 1.6;
+            margin-left: 2.2rem;
+        }
+
+        .message.user .message-avatar {
+            background-color: #1a1a1a;
+        }
+
+        .message.bot .message-avatar {
+            background-color: #2c2c2c;
+        }
+
+        .chat-input-area {
+            padding: 1rem;
+            background-color: #0c0c0c;
+            border-top: 1px solid #1a1a1a;
+        }
+
+        .chat-input-container {
+            display: flex;
+            align-items: center;
+            background-color: #1a1a1a;
+            border-radius: 3px;
+            padding: 0.5rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            padding: 0.5rem;
+            outline: none;
+        }
+
+        .chat-input::placeholder {
+            color: #6a6a6a;
+        }
+
+        .chat-send-btn {
+            background-color: transparent;
+            border: none;
+            color: #8a8a8a;
+            cursor: pointer;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .chat-send-btn:hover {
+            color: #ffffff;
+        }
+
+        /* Features section styles */
+        .features {
+            padding: 5rem 2rem;
+            background: #000000;
+            border-top: 1px solid #1a1a1a;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 3rem;
+            letter-spacing: -0.5px;
+        }
+
+        .features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            padding: 1.5rem;
+            background-color: #0c0c0c;
+            border: 1px solid #1a1a1a;
+            border-radius: 3px;
+        }
+
+        .feature-card:hover {
+            border-color: #2a2a2a;
+        }
+
+        .feature-card i {
+            font-size: 1.2rem;
+            color: #ffffff;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            color: #ffffff;
+        }
+
+        .feature-card p {
+            color: #8a8a8a;
+            font-size: 0.8rem;
+            line-height: 1.5;
+        }
+
+        /* Pricing section styles */
+        .pricing {
+            padding: 5rem 2rem;
+            background: #000000;
+            border-top: 1px solid #1a1a1a;
+        }
+
+        .pricing-grid {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .price-card {
+            padding: 1.5rem;
+            background-color: #0c0c0c;
+            border: 1px solid #1a1a1a;
+            border-radius: 3px;
+        }
+
+        .price-card:hover {
+            border-color: #2a2a2a;
+        }
+
+        .price-card.premium {
+            border-color: #2a2a2a;
+        }
+
+        .price-card h3 {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+        }
+
+        .price {
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 1rem 0;
+            color: #ffffff;
+        }
+
+        .price-features {
+            list-style: none;
+            margin: 1.5rem 0;
+        }
+
+        .price-features li {
+            margin: 0.5rem 0;
+            color: #8a8a8a;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            line-height: 1.5;
+        }
+
+        .price-features i {
+            color: #ffffff;
+            margin-right: 0.5rem;
+            font-size: 0.7rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 0.7rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            background: #ffffff;
+            color: #000000;
+            text-decoration: none;
+            border-radius: 3px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .cta-button:hover {
+            opacity: 0.9;
+        }
+
+        /* Footer styles */
+        footer {
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid #1a1a1a;
+            background: #000000;
+        }
+
+        footer p {
+            color: #6a6a6a;
+            font-size: 0.8rem;
+        }
+
+        /* Media queries */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+
+            .hero p {
+                font-size: 0.9rem;
+            }
+
+            .nav-links a {
+                margin-left: 1rem;
+            }
+
+            .chat-interface {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <a href="/" class="logo">NettyGPT</a>
+            <div class="nav-links">
+                <a href="/login">Войти</a>
+                <a href="/register" class="register">Регистрация</a>
+                <a href="/chat" class="chat">Чат</a>
+            </div>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Создавайте что угодно с помощью NettyGPT</h1>
+            <p>NettyGPT - это универсальный ИИ-ассистент для общения, генерации изображений и решения сложных задач</p>
+            
+            <div class="chat-interface">
+                <div class="chat-header">
+                    <i class="fas fa-comment chat-header-icon"></i>
+                    <span class="chat-header-title">Новый чат</span>
+                </div>
+                <div class="chat-messages">
+                    <div class="message bot">
+                        <div class="message-header">
+                            <div class="message-avatar">N</div>
+                            <div class="message-name">NettyGPT</div>
+                        </div>
+                        <div class="message-content">
+                            Привет! Я NettyGPT, ваш ИИ-ассистент. Задайте мне любой вопрос!
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <div class="chat-input-container">
+                        <input type="text" class="chat-input" placeholder="Напишите сообщение..." id="user-input">
+                        <button class="chat-send-btn" onclick="sendMessage()">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features">
+        <h2 class="section-title">Возможности</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fas fa-robot"></i>
+                <h3>Умный диалог</h3>
+                <p>Общайтесь с ИИ на любые темы. Получайте точные ответы и помощь в решении задач.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-image"></i>
+                <h3>Генерация изображений</h3>
+                <p>Создавайте уникальные изображения по текстовому описанию с помощью современных алгоритмов.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-brain"></i>
+                <h3>Два режима</h3>
+                <p>Используйте базовую модель GPT-4o или получите доступ к продвинутой O3-mini для сложных задач.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="pricing">
+        <h2 class="section-title">Тарифы</h2>
+        <div class="pricing-grid">
+            <div class="price-card">
+                <h3>Базовый</h3>
+                <div class="price">Бесплатно</div>
+                <ul class="price-features">
+                    <li><i class="fas fa-check"></i>Модель GPT-4o</li>
+                    <li><i class="fas fa-check"></i>15 изображений в день</li>
+                    <li><i class="fas fa-check"></i>Базовый контекст</li>
+                </ul>
+                <a href="/register" class="cta-button">Начать бесплатно</a>
+            </div>
+            <div class="price-card premium">
+                <h3>Premium</h3>
+                <div class="price">100 ₽/месяц</div>
+                <ul class="price-features">
+                    <li><i class="fas fa-check"></i>Модель O3-mini</li>
+                    <li><i class="fas fa-check"></i>Безлимитная генерация</li>
+                    <li><i class="fas fa-check"></i>Расширенный контекст</li>
+                    <li><i class="fas fa-check"></i>Приоритетная поддержка</li>
+                </ul>
+                <a href="/register" class="cta-button">Получить Premium</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 NettyGPT</p>
+    </footer>
+
+    <script>
+        function sendMessage() {
+            const userInput = document.getElementById('user-input');
+            const message = userInput.value.trim();
+            
+            if (message) {
+                // Добавляем сообщение пользователя
+                const messagesContainer = document.querySelector('.chat-messages');
+                
+                const userMessage = document.createElement('div');
+                userMessage.className = 'message user';
+                userMessage.innerHTML = `
+                    <div class="message-header">
+                        <div class="message-avatar">Я</div>
+                        <div class="message-name">Вы</div>
+                    </div>
+                    <div class="message-content">
+                        ${message}
+                    </div>
+                `;
+                
+                messagesContainer.appendChild(userMessage);
+                
+                // Очищаем поле ввода
+                userInput.value = '';
+                
+                // Прокручиваем чат вниз
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                
+                // Перенаправляем на страницу входа
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 1000);
+            }
+        }
+
+        // Добавляем обработчик Enter для инпута
+        document.getElementById('user-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>

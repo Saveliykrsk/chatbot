@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оплата успешна | NettyGPT</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <meta http-equiv="refresh" content="2;url=/">  <!-- Автоматическое перенаправление через 2 секунды -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: all 0.1s ease;
+        }
+        
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: #000000;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        
+        .success-container {
+            background-color: #0c0c0c;
+            padding: 30px;
+            border-radius: 3px;
+            border: 1px solid #1a1a1a;
+            width: 100%;
+            max-width: 340px;
+            text-align: center;
+        }
+        
+        .success-icon {
+            font-size: 32px;
+            color: #ffffff;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-weight: 500;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            letter-spacing: -0.5px;
+        }
+        
+        p {
+            margin-bottom: 20px;
+            color: #8a8a8a;
+            font-size: 0.8rem;
+            line-height: 1.5;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #1a1a1a;
+            border-radius: 50%;
+            border-top-color: #ffffff;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .back-button {
+            display: inline-block;
+            padding: 10px 12px;
+            background-color: #ffffff;
+            color: #000000;
+            text-decoration: none;
+            border-radius: 3px;
+            margin-top: 20px;
+            font-weight: 500;
+            font-size: 0.8rem;
+        }
+        
+        .back-button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <i class="fas fa-check success-icon"></i>
+        <h1>Платеж обрабатывается</h1>
+        <p>Вы будете перенаправлены на главную страницу через несколько секунд...</p>
+        <div class="loading-spinner"></div>
+        <a href="/" class="back-button">
+            <i class="fas fa-arrow-left"></i> Вернуться на главную
+        </a>
+    </div>
+</body>
+</html> 
